@@ -1,0 +1,159 @@
+<resources>
+
+    <string name="app_name">FloralEye</string>
+
+    <string name="title_home">Home</string>
+    <string name="title_dictionary">Dictionary</string>
+    <string name="title_favourites">Favourites</string>
+    <string name="title_photo">Photo</string>
+    <string name="title_profile">Profile</string>
+
+
+    <string name="str_logout">Log Out</string>
+    <string name="str_delete_user">Delete User</string>
+    <string name="str_edit_profile">Edit Profile</string>
+
+    <string name="str_warning">Warning</string>
+    <string name="str_ok">OK</string>
+    <string name="str_cancel">Cancel</string>
+
+    <string name="str_generic_error">There is a problem. Try later</string>
+
+    <string name="str_generic_backend_error">There is a problem with connection. Try later</string>
+
+    <!-- start region - onboard -->
+
+    <string name="str_signup_button">Sign Up</string>
+    <string name="str_name_hint">Name</string>
+    <string name="str_surname_hint">Surname</string>
+    <string name="str_mail_hint">E-Mail</string>
+    <string name="str_password_hint">Password</string>
+    <string name="str_repeat_password_hint">Repeat Password</string>
+    <string name="str_login_text">Do you already have an account?</string>
+    <string name="str_signup_text">You don\'t have an account?</string>
+    <string name="str_login_button">Log In</string>
+    <string name="str_forgot_password"><u>Password Forgotten?</u></string>
+    <string name="str_password_no_match">Passwords do not match!</string>
+    <string name="str_no_mail">Please, insert a valid e-mail.</string>
+    <string name="str_credential_not_valid">Credential is not valid.</string>
+    <string name="str_no_password">Please, insert a valid password.</string>
+    <string name="str_password_not_valid">Specified password is not valid. The password must contains at least 8 characters, one lower-case, one upper-case, one number and one special character. It cannot contains spaces.</string>
+    <string name="str_no_repeat_password">Please, repeat the password.</string>
+    <string name="str_signup_network_error">There is a problem. Check your internet connectivity and retry.</string>
+    <string name="str_mail_already_in_use_error">This e-mail is already in use. Try another one</string>
+    <string name="str_password_weak_error">Specified password is too weak.</string>
+    <string name="str_onboard_success">Onboard successfully completed. You will be redirected to Dashboard.</string>
+    <string name="str_check_onboard">Checking your Data. Please Wait …</string>
+    <string name="str_loading_data">We are loading your data. Please Wait …</string>
+    <string name="str_send_reset_password_mail_ok">We have send you an e-mail to reset your password. Check also in the spam folder.</string>
+    <string name="str_invalid_user_error">There is no user associated with this e-mail.</string>
+    <string name="str_mail_not_verified">
+        Your account is not verified. Please, verify your account by clicking on the verification
+        link sent to your email. Click OK if you want us to resend the email.
+    </string>
+    <string name="str_send_verify_mail_ok">We have sent you an email to verify your account. Please, also check your spam folder.</string>
+    <string name="str_signup_ok">Sign up completed successfully. Before logging in, verify your account via the email we have sent you.</string>
+    <string name="str_too_may_request">Too many requests have been performed. Please, try again later.</string>
+
+    <!-- end region - onboard -->
+
+    <!-- inizio regione - quiz -->
+
+    <string name="str_submit_button">Submit</string>
+    <string name="str_next_button">Next</string>
+    <string name="str_question">Question</string>
+    <string name="str_answer1">First answer</string>
+    <string name="str_answer2">Second answer</string>
+    <string name="str_answer3">Third answer</string>
+    <string name="str_answer4">Fourth answer</string>
+    <string name="str_title_quiz">Quiz</string>
+    <string name="str_quiz_not_displayed">The elements of the quiz are not displayed</string>
+
+    <string name="str_quizrepository_identifier">id</string>
+    <string name="str_quizrepository_question">question</string>
+    <string name="str_quizrepository_solution">solution</string>
+    <string name="str_quizrepository_image">image</string>
+    <string name="str_quizrepository_answer1">answer1</string>
+    <string name="str_quizrepository_answer2">answer2</string>
+    <string name="str_quizrepository_answer3">answer3</string>
+    <string name="str_quizrepository_answer4">answer4</string>
+
+    <string name="str_new_quiz">New</string>
+    <string name="str_old_quizzes">Old</string>
+    <string name="str_image_of_old_quiz">Image of old quiz</string>
+    <string name="str_answer">Answer</string>
+    <string name="str_solution">Solution</string>
+    <string name="str_date">Date</string>
+    <string name="str_user_answer_prefix">"User answer: "</string>
+    <string name="str_solution_prefix">"Solution: "</string>
+    <string name="str_no_answer">No answer</string>
+    <string name="str_empty_quiz_history">The history of quizzes is empty.</string>
+
+    <!-- fine regione - quiz -->
+
+    <!-- inizio regione - dizionario -->
+
+    <string name="str_image_flower_details">flowerImage</string>
+    <string name="str_field_details_kingdom">"Kingdom: "</string>
+    <string name="str_field_details_phylum">"Phylum: "</string>
+    <string name="str_field_details_order">"Order: "</string>
+    <string name="str_field_details_family">"Family: "</string>
+    <string name="str_field_details_genus">"Genus: "</string>
+    <string name="str_field_details_species">"Species: "</string>
+    <string name="str_taxonomy_details">Taxonomy</string>
+    <string name="str_slash_dictionary">" / "</string>
+    <string name="str_snack_notification_dictionary">Failed to retrieve data, please retry!</string>
+    <string name="str_search_dictionary">Search</string>
+    <string name="str_filter_dictionary">Filters</string>
+    <string name="str_apply_filter">Apply</string>
+    <string name="str_reset_filter">Reset</string>
+    <string name="str_dictionary_empty">No flowers match your filters!</string>
+    <string name="str_dictionary_empty_favourites">No flowers added to favourites!</string>
+    <string name="str_refresh_message">Do you really want to refresh dictionary? This operation may take a while.</string>
+
+    <!-- fine regione - dizionario -->
+
+    <!-- inizio regione - photo -->
+
+    <string name="str_choose_photo">Choose</string>
+    <string name="str_choose_photo_message">Click LOAD to load an existing photo. Click TAKE to take a new photo via phone camera.</string>
+    <string name="str_load_photo">Load</string>
+    <string name="str_take_photo">Take</string>
+    <string name="str_identify">Identify</string>
+    <string name="str_first_result">First Result</string>
+    <string name="str_first_confidence">First Confidence</string>
+    <string name="str_second_result">Second Result</string>
+    <string name="str_second_confidence">Second Confidence</string>
+    <string name="str_third_result">Third Result</string>
+    <string name="str_third_confidence">Third Confidence</string>
+    <string name="str_not_flower">This is not a flower!</string>
+    <string name="str_confidence">Confidence: %s</string>
+
+    <!-- fine regione - photo -->
+
+    <!-- inizio regione - profilo -->
+
+    <string name="str_no_user">Mail not found!</string>
+    <string name="str_login_too_old">This operation is very sensitive. Before performing it, please verify your identity by logging out and execute login.</string>
+    <string name="str_delete_user_confirmation">Do you really want to delete your account? This operation cannot be reverted.</string>
+    <string name="str_current_password_hint">Current Password</string>
+    <string name="str_new_password_hint">New Password</string>
+    <string name="str_change_password">Change Password</string>
+    <string name="str_change_password_equal">New password is equal to current.</string>
+    <string name="str_edit_profile_message">For now, in the edit section you can only change your password. If you successfully change your password, you will be logged out. Click OK if you want to continue.</string>
+    <string name="str_total_answers">Total Answers</string>
+    <string name="str_correct_answers">Correct Answers</string>
+    <string name="str_wrong_answers">Wrong Answers</string>
+    <string name="str_quiz_score">Quiz Score</string>
+    <string name="str_percentage">%s\%%</string>
+    <string name="str_total_answers_number">Total: %s</string>
+    <string name="str_correct_answers_number">Correct: %s</string>
+    <string name="str_wrong_answers_number">Wrong: %s</string>
+    <string name="str_show_quizzes">Show Quizzes</string>
+    <string name="str_total_zero">Total: 0</string>
+    <string name="str_correct_zero">Correct: 0</string>
+    <string name="str_wrong_zero">Wrong: 0</string>
+
+    <!-- fine regione - profilo -->
+
+</resources>

@@ -1,0 +1,360 @@
+# A causa delle limitate risorse a disposizione, si è deciso di rendere l'esecuzione della
+# pipeline solo manuale e ad ogni merge request. Nello scenario in cui non si hanno problemi
+# di risorse, si eseguirebbe la pipeline ad ogni commit su qualunque branch, in modo da verificare
+# fin da subito se il codice implementato rispetta le caratteristiche di qualità definite per il
+# progetto.
+
+# In questo modo, la pipeline viene eseguita solo ad ogni merge request o richiesta di esecuzione
+# manuale. Si noti che, nel caso di esecuzione scaturita dall'aperura di una merge request, la
+# pipeline viene eseguita sul branch che si otterrebbe se si accettasse tale merge request.
+workflow:
+  rules:
+    - if: $CI_PIPELINE_SOURCE == 'merge_request_event' || $CI_PIPELINE_SOURCE == 'web'
+
+
+### ----
+### Immagine di default
+image: openjdk:11-jdk
+
+
+### ----
+### Variabili necessarie nei diversi stage della pipeline, considerate in aggiunta a quelle di
+### default definite nella sezione Variables CI/CD di GitLab.
+variables:
+
+  ## ----
+  ## Variabili utilizzabili per decidere quali stage della pipeline eseguire e quali no.
+  ## Se nessuna di queste variabili viene settata, verranno eseguiti tutti gli stage.
+
+  # Variabile che, se settata a false, permette di saltare lo stage di build.
+  BUILD_STAGE: 'true'
+
+  # Variabile che, se settata a false, permette di saltare lo stage di unit test.
+  UNIT_TEST_STAGE: 'true'
+
+  # Variabile che, se settata a false, permette di saltare lo stage di instrumented test.
+  INSTRUMENTED_TEST_STAGE: 'true'
+
+  # Variabile che, se settata a false, permette di saltare lo stage di generazione del report
+  # con la coverage ottenuta dai test.
+  COVERAGE_REPORT_STAGE: 'true'
+
+  # Variabile che, se settata a false, permette di saltare lo stage di analisi statica.
+  STATIC_ANALYSIS_STAGE: 'true'
+
+  # Variabile che, se settata a false, permette di saltare lo stage di generazione della doc.
+  DOC_STAGE: 'true'
+
+
+  ## ----
+  ## Variabili per il setup di Firebase Test Lab, utilizzato per l'esecuzione degli
+  ## instrumented test
+
+  CLOUD_PROJECT_ID: 'floraleye'
+
+  # Configurazione del device da utilizzare per l'esecuzione dei test di strumentazione.
+  # Si veda https://firebase.google.com/docs/test-lab/android/command-line?hl=en.
+  TEST_LAB_DEVICE_CONFIGURATION: "redfin,version=30,locale=en,orientation=portrait"
+
+
+  ## ----
+  ## Variabili per il setup dell'ambiente Android.
+
+  # ANDROID_COMPILE_SDK, deve corrispondere alla versione di android considerata
+  # per la compilazione.
+  ANDROID_COMPILE_SDK: "33"
+
+  # ANDROID_BUILD_TOOLS, deve corrispondere alla versione degli Android Build Tools
+  # che si utilizzano.
+  ANDROID_BUILD_TOOLS: "33.0.1"
+
+  # Versione dei CL Tools che verranno scaricati dal sito ufficiale di Android.
+  ANDROID_SDK_TOOLS: "6514223"
+
+
+### ----
+### Script per l'importazione dei servizi necessari per l'esecuzione di task Gradle.
+before_script:
+  # Prima di tutto, si controlla la presenza del file ./gradlew.
+  - if [ -f ./gradlew ]; then
+    echo "File Gradlew non presente. La pipeline verrà interrotta ..."
+    exit 1;
+    fi
+  # Si rende il file ./gradlew eseguibile.
+  - chmod +x ./gradlew
+  # Si definiscono le variabili d'ambiente necessarie.
+  - export GRADLE_USER_HOME=`pwd`/.gradle
+  - export ANDROID_HOME="${PWD}/android-home"
+
+
+### ----
+### Definizione stages della pipeline.
+stages:
+  - install-dependencies
+  - build
+  - test
+  - coverage-report
+  - static-analysis
+  - generate-doc
+  - deploy-doc
+
+
+### ----
+### Script per l'istallazione dei packages Android necessarie, e loro salvataggio nella cache, in
+### modo da renderli utilizzabili da altri stage che li necessitano.
+installDependencies:
+  stage: install-dependencies
+  before_script: []
+  interruptible: true
+  rules:
+    - when: always
+  cache:
+    paths:
+      - .gradle/wrapper
+      - .gradle/caches
+      - android-home/
+    policy: push
+  script:
+    - apt-get --quiet update --yes
+    - apt-get --quiet install --yes wget tar unzip lib32stdc++6 lib32z1
+
+    # Setup percorso /android-home per inserirci l'sdk scaricato.
+    - export ANDROID_HOME="${PWD}/android-home"
+    - install -d $ANDROID_HOME
+
+    # Download degli androidSDK tools dal sito ufficiale. Successivamente, il file viene decompresso
+    # e vengono eseguiti una serie di comandi per installare i package necessari per eseguire la build
+    # dell'applicazione.
+    - wget --output-document=$ANDROID_HOME/cmdline-tools.zip https://dl.google.com/android/repository/commandlinetools-linux-${ANDROID_SDK_TOOLS}_latest.zip
+    - pushd $ANDROID_HOME
+    - unzip -d cmdline-tools cmdline-tools.zip
+    - popd
+    - export PATH=$PATH:${ANDROID_HOME}/cmdline-tools/tools/bin/
+
+    # Controllo della versione dell'SDK manager.
+    - sdkmanager --version
+
+    # Accettazione di tutte le licenze.
+    - yes | sdkmanager --sdk_root=${ANDROID_HOME} --licenses || true
+    - sdkmanager --sdk_root=${ANDROID_HOME} "platforms;android-${ANDROID_COMPILE_SDK}"
+    - sdkmanager --sdk_root=${ANDROID_HOME} "platform-tools"
+    - sdkmanager --sdk_root=${ANDROID_HOME} "build-tools;${ANDROID_BUILD_TOOLS}"
+
+
+### ----
+### Generazione dell'APK relativo all'applicazione e dell'APK relativo ai test di strumentazione.
+assembleDebug:
+  stage: build
+  interruptible: true
+  cache:
+    paths:
+      - .gradle/wrapper
+      - .gradle/caches
+      - android-home/
+    policy: pull
+  rules:
+    - if: '$BUILD_STAGE == "false"'
+      when: never
+    - when: on_success
+  script:
+    - echo "Make Project...";
+      ./gradlew assembleDebug assembleAndroidTest;
+    - echo "Save Result...";
+      mkdir -p apks;
+      mv app/build/outputs/apk/debug/app-debug.apk apks/main.apk;
+      mv app/build/outputs/apk/androidTest/debug/app-debug-androidTest.apk apks/androidTest.apk;
+  artifacts:
+    paths:
+      - apks/main.apk
+      - apks/androidTest.apk
+      - app/build/tmp/kotlin-classes/debug
+
+
+### ----
+### Esecuzione dei test di strumentazione tramite Firebase Test Lab.
+### Questo stage viene eseguito solo se:
+###   - è stato eseguito precedentemente lo stage di BUILD, quindi BUILD_STAGE == true;
+###   - il flag relativo a questo stage è true, quindi INSTRUMENTED_TEST_STAGE == true;
+###   - l'esecuzione della pipeline è scaturtita da una merge request.
+### Si è deciso di agire in questo modo a causa delle limitate risorse a disposizione in termini
+### di minuti della pipeline e device disponibili per il test su Firebase Test Lab.
+instrumentedTest:
+  stage: test
+  interruptible: true
+  allow_failure: false
+  dependencies:
+    - assembleDebug
+  rules:
+    - if: '$INSTRUMENTED_TEST_STAGE == "false" || $BUILD_STAGE == "false"'
+      when: never
+    - when: on_success
+  variables:
+    SECURE_FILES_DOWNLOAD_PATH: '/'
+  before_script:
+    # Download firebase service account da gitlab secure files
+    - curl --silent "https://gitlab.com/gitlab-org/incubation-engineering/mobile-devops/download-secure-files/-/raw/main/installer" | bash
+    # Installazione Google Cloud SDK
+    - wget --quiet --output-document=/tmp/google-cloud-sdk.tar.gz https://dl.google.com/dl/cloudsdk/channels/rapid/google-cloud-sdk.tar.gz
+    - mkdir -p /opt
+    - tar zxf /tmp/google-cloud-sdk.tar.gz --directory /opt
+    - /opt/google-cloud-sdk/install.sh --quiet
+    - source /opt/google-cloud-sdk/path.bash.inc
+    - gcloud components update
+    # Login nel progetto Firebase
+    - gcloud auth activate-service-account --key-file firebase-service-account.json
+    - gcloud config set project $CLOUD_PROJECT_ID
+  script:
+    # Stampa dell'elenco dei dispositivi disponibili per eseguire i test.
+    - gcloud firebase test android models list
+    # Esecuzione dei test di strumentazione.
+    - gcloud firebase test android run --type instrumentation --use-orchestrator --no-record-video --app apks/main.apk --test apks/androidTest.apk --device model=$TEST_LAB_DEVICE_CONFIGURATION  --client-details matrixLabel="Example matrix label" --environment-variables clearPackageData=true,coverage=true,coverageFilePath=/sdcard/Download/ --directories-to-pull /sdcard/Download
+  after_script:
+    # Download firebase service account da gitlab secure files
+    - curl --silent "https://gitlab.com/gitlab-org/incubation-engineering/mobile-devops/download-secure-files/-/raw/main/installer" | bash
+    # Installazione Google Cloud SDK
+    - wget --quiet --output-document=/tmp/google-cloud-sdk.tar.gz https://dl.google.com/dl/cloudsdk/channels/rapid/google-cloud-sdk.tar.gz
+    - mkdir -p /opt
+    - tar zxf /tmp/google-cloud-sdk.tar.gz --directory /opt
+    - /opt/google-cloud-sdk/install.sh --quiet
+    - source /opt/google-cloud-sdk/path.bash.inc
+    - gcloud components update
+    # Login nel progetto Firebase
+    - gcloud auth activate-service-account --key-file firebase-service-account.json
+    - gcloud config set project $CLOUD_PROJECT_ID
+    # Download file relativo alla coverage ottenuta
+    - mkdir -p app/build/outputs/code_coverage
+    - gsutil -m cp "`gsutil ls gs://test-lab-3zwqibv0751d4-kqd39kzk2nvhx | tail -1`redfin-30-en-portrait/artifacts/sdcard/Download/*.ec" app/build/outputs/code_coverage
+  artifacts:
+    when: always
+    paths:
+      - app/build/outputs/code_coverage
+
+
+### ----
+### Esecuzione dei test di unità e salvataggio file per il calcolo della coverage.
+unitTest:
+  stage: test
+  interruptible: true
+  allow_failure: false
+  coverage: '/    - Instruction Coverage: ([0-9.]+)%/'
+  dependencies: []
+  rules:
+    - if: '$UNIT_TEST_STAGE == "false"'
+      when: never
+    - when: on_success
+  cache:
+    paths:
+      - .gradle/wrapper
+      - .gradle/caches
+      - android-home/
+    policy: pull
+  script:
+    - echo "Esecuzione Unit Tests ...";
+      ./gradlew jacocoUnitTestReport;
+  after_script:
+    # Salvataggio file coverage, necessario per calcolo coverage unificata
+    - echo "Salvataggio coverage files ...";
+      mkdir -p app/build/outputs/code_coverage;
+      mv app/build/outputs/unit_test_code_coverage/debugUnitTest/testDebugUnitTest.exec app/build/outputs/code_coverage/testDebugUnitTest.ec;
+  artifacts:
+    when: always
+    paths:
+      - app/build/reports/coverage/jacocoUnitTestReport/html
+      - app/build/reports/tests/testDebugUnitTest
+      - app/build/outputs/code_coverage
+
+
+### ----
+### Generazione report della coverage e controllo del valore di coverage totale ottenuto.
+### Se il valore coverage ottenuto è minore della soglia, questo job fallisce.
+coverageReport:
+  stage: coverage-report
+  interruptible: true
+  allow_failure: false
+  dependencies:
+    - assembleDebug
+    - instrumentedTest
+    - unitTest
+  coverage: '/    - Instruction Coverage: ([0-9.]+)%/'
+  rules:
+    - if: '$COVERAGE_REPORT_STAGE == "false" || $INSTRUMENTED_TEST_STAGE == "false" || $BUILD_STAGE == "false"'
+      when: never
+    - when: on_success
+  script:
+    - echo "Creazione Coverage Report ...";
+      ./gradlew jacocoTestReports;
+    # Controllo Coverage
+    - cov=$(cat app/build/reports/coverage/jacocoTestReports/html/index.html | grep -o '<td class="ctr2">[^<]*</td>' | sed 's/<[^>]*>//g; s/^/Instruction Coverage /' | head -1)
+    - covValue=$(echo "$cov" | grep -oE '[0-9]+')
+    - echo "$covValue"
+    - if [[ $covValue -lt $MINIMUM_COVERAGE_PERCENT ]]; then exit 1; fi
+  artifacts:
+    paths:
+      - app/build/reports/coverage/jacocoTestReports/html
+
+
+### ----
+### Analisi statica con detekt, e salvataggio report in formato html.
+staticAnalysis:
+  stage: static-analysis
+  allow_failure: true
+  interruptible: true
+  dependencies: []
+  rules:
+    - if: '$STATIC_ANALYSIS_STAGE == "false"'
+      when: never
+    - when: on_success
+  cache:
+    paths:
+      - .gradle/wrapper
+      - .gradle/caches
+      - android-home/
+    policy: pull
+  script:
+    - echo "Esecuzione analisi statica del codice ...";
+      ./gradlew detektMain detektDebugAndroidTest detektDebugUnitTest;
+  artifacts:
+    when: always
+    paths:
+      - app/build/reports/detekt
+
+
+### ----
+### Generazione della documentazione tecnica con Dokka, e suo salvtaggio nella cartella public.
+generateDoc:
+  stage: generate-doc
+  dependencies: []
+  rules:
+    - if: '$DOC_STAGE == "false"'
+      when: never
+    - when: on_success
+  cache:
+    paths:
+      - .gradle/wrapper
+      - .gradle/caches
+      - android-home/
+    policy: pull
+  script:
+    - ./gradlew dokkaHtml
+  artifacts:
+    paths:
+      - public
+
+
+### ----
+### Deploy della documentazione tecnica tramite il meccanismo delle pages di GitLab.
+pages:
+  image: busybox
+  before_script: []
+  stage: deploy-doc
+  dependencies:
+    - generateDoc
+  rules:
+    - if: '$DOC_STAGE == "false"'
+      when: never
+    - when: on_success
+  script:
+    - echo "The site will be deployed to $CI_PAGES_URL"
+  artifacts:
+    paths:
+      - public

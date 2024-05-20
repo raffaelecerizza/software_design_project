@@ -1,0 +1,31 @@
+/**
+ * Gradle Build File di alto livello, dove possono essere aggiunte opzioni comuni a tutti i
+ * sotto progetti.
+ */
+
+buildscript {
+
+    ext.jacocoVersion = '0.8.8'
+
+    repositories {
+
+        google()  // Google's Maven repository
+        mavenCentral()  // Maven Central repository
+    }
+
+    dependencies {
+
+        // Aggiunta dipendenza per i servizi di Google
+        classpath 'com.google.gms:google-services:4.3.15'
+
+        classpath "org.jacoco:org.jacoco.core:0.8.8"
+    }
+}
+
+plugins {
+    id 'com.android.application' version '7.4.2' apply false
+    id 'com.android.library' version '7.4.2' apply false
+    id 'org.jetbrains.kotlin.android' version '1.8.0' apply false
+    id 'io.gitlab.arturbosch.detekt' version '1.22.0' apply false
+    id 'org.jetbrains.dokka' version '1.8.10' apply false
+}

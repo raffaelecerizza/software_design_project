@@ -1,0 +1,38 @@
+<?xml version="1.0" encoding="utf-8"?>
+<navigation xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/mobile_navigation"
+    app:startDestination="@+id/navigation_profile">
+
+    <fragment
+        android:id="@+id/navigation_quiz"
+        android:name="com.example.floraleye.ui.quiz.QuizFragment"
+        android:label="@string/str_title_quiz"
+        tools:layout="@layout/fragment_quiz" />
+
+    <fragment
+        android:id="@+id/navigation_dictionary"
+        android:name="com.example.floraleye.ui.dictionary.DictionaryTabFragment"
+        android:label="@string/title_dictionary"
+        tools:layout="@layout/fragment_dictionary_tab" />
+
+    <fragment
+        android:id="@+id/navigation_photo"
+        android:name="com.example.floraleye.ui.photo.PhotoFragment"
+        android:label="@string/title_photo"
+        tools:layout="@layout/fragment_photo" />
+
+    <fragment
+        android:id="@+id/navigation_profile"
+        android:name="com.example.floraleye.ui.profile.ProfileFragment"
+        android:label="@string/title_profile"
+        tools:layout="@layout/fragment_profile" >
+        <action
+            android:id="@+id/action_navigation_profile_to_navigation_quiz"
+            app:destination="@id/navigation_quiz"
+            app:popUpTo="@id/navigation_profile"
+            app:popUpToInclusive="true"
+            app:launchSingleTop="true"/>
+    </fragment>
+</navigation>

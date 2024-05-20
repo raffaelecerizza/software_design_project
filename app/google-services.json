@@ -1,0 +1,40 @@
+{
+  "project_info": {
+    "project_number": "252060182059",
+    "firebase_url": "https://floraleye-default-rtdb.europe-west1.firebasedatabase.app",
+    "project_id": "floraleye",
+    "storage_bucket": "floraleye.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:252060182059:android:4f2a01f9909afbfb586c6e",
+        "android_client_info": {
+          "package_name": "com.example.floraleye"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "252060182059-4nshjc1ecjak5487s4rkn31qcda2eghc.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyAhFeukomm44GZexuYlGS4DZ3VTm9dBrbs"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "252060182059-4nshjc1ecjak5487s4rkn31qcda2eghc.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
