@@ -1,10 +1,6 @@
 <div align="center">
 
 # FloralEye
-[![pipeline_status](https://gitlab.com/academicunimib/unimib-laboratorio-progettazione/badges/main/pipeline.svg)](https://gitlab.com/academicunimib/unimib-laboratorio-progettazione/commits/main)
-[![coverage_unit_test](https://gitlab.com/academicunimib/unimib-laboratorio-progettazione/badges/main/coverage.svg?job=unitTest&key_text=unit++test+coverage&key_width=110)]()
-[![coverage_total](https://gitlab.com/academicunimib/unimib-laboratorio-progettazione/badges/main/coverage.svg?job=coverageReport&key_text=total++coverage&key_width=110)]()
-[![release](https://img.shields.io/badge/release-latest%20apk-brightgreen)](https://gitlab.com/api/v4/projects/44080215/jobs/artifacts/main/raw/apks/main.apk?job=assembleDebug)
 
 </div>
 
@@ -32,14 +28,6 @@ Applicazione Android di supporto al riconoscimento e all’apprendimento di fior
 - **AI Riconoscimento**: l'utente ha la possibilità di fotografare un fiore, e sottoporlo all'applicazione per il riconoscimento tramite un modello di machine learning. 
 
 </div>
-
-## Documentazione
-
-<div align="justify">
-
-Documentazione del progetto disponibile [qui](https://gitlab.com/academicunimib/unimib-laboratorio-progettazione/-/wikis/home).
-
-Documentazione tecnica del codice disponibile [qui](https://academicunimib.gitlab.io/unimib-laboratorio-progettazione).
 
 </div>
 
