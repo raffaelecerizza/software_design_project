@@ -33,14 +33,6 @@ Applicazione Android di supporto al riconoscimento e all’apprendimento di fior
 
 ## Installazione
 
-### Download del file APK
-
-<div align="justify">
-
-La versione più recente del file APK per il presente progetto è disponibile per il download attraverso un semplice click sul badge Release mostrato in cima al file Readme.
-
-</div>
-
 ### Installazione del file APK su telefono Android
 
 <div align="justify">
